@@ -1,4 +1,6 @@
 from openai import OpenAI
+import openai
+import time
 
 
 class ContentClient:
@@ -32,7 +34,7 @@ class ContentClient:
             )
         else:
             self.system_role = system_role
-        self.openai_message = [{"role": "system", "content": self.system_role}]
+        self.openai_message = [{"role": "system", "content": self.system_role},]
 
     def get_notes_from_text(self, openai_model: str | None = None,
                             openai_max_tokens: int | None = None,
@@ -69,15 +71,22 @@ class ContentClient:
             Provide notes for the following information:
 
             """
-            print(f"Using default prompt as below: \n {prompt}")
         prompt += "\n```" + text + "```"
-        self.openai_message.append({"role": "user", "content": text})
+        self.openai_message.append({"role": "user", "content": prompt})
 
-        response = self.openai_client.complete(
-            model=openai_model,
-            messages=self.openai_message,
-            max_tokens=openai_max_tokens,
-            temperature=openai_temperature,
-        )
+        try:
+            response = self.openai_client.chat.completions.create(
+                model=openai_model,
+                messages=self.openai_message,
+                max_tokens=openai_max_tokens,
+                temperature=openai_temperature)
+        except openai.RateLimitError as E:
+            print("Rate Limit Error ", E)
+            time.sleep(65)
+            response = self.openai_client.chat.completions.create(
+                model=openai_model,
+                messages=self.openai_message,
+                max_tokens=openai_max_tokens,
+                temperature=openai_temperature)
         return response.choices[0].message.content
     

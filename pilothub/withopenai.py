@@ -81,8 +81,8 @@ class ContentClient:
                 max_tokens=openai_max_tokens,
                 temperature=openai_temperature)
         except openai.RateLimitError as E:
-            print("Rate Limit Error ",E)
-            time.sleep(60)
+            print("Rate Limit Error ", E)
+            time.sleep(65)
             response = self.openai_client.chat.completions.create(
                 model=openai_model,
                 messages=self.openai_message,
