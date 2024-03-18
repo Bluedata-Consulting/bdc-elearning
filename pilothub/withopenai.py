@@ -73,7 +73,8 @@ class ContentClient:
             """
         prompt += "\n```" + text + "```"
         self.openai_message.append({"role": "user", "content": prompt})
-
+        if not prompt:
+            return text
         try:
             response = self.openai_client.chat.completions.create(
                 model=openai_model,
