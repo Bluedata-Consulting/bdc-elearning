@@ -11,6 +11,15 @@ class ContentClient:
                  max_tokens: int = 2000,
                  temperature: float = 0.7,
                  ):
+        """
+        Initializes the WithOpenAI object.
+
+        Args:
+            openai_api_key (str): The OpenAI API key. Required.
+            open_ai_model (str): The OpenAI model to use. Defaults to "gpt-3.5-turbo".
+            max_tokens (int): The maximum number of tokens to generate in the response. Defaults to 2000.
+            temperature (float): The temperature parameter for text generation. Higher values result in more random outputs. Defaults to 0.7.
+        """
         if openai_api_key is None:
             raise ValueError("Please provide an OpenAI API key.")
         self.openai_api_key = openai_api_key
@@ -89,5 +98,8 @@ class ContentClient:
                 messages=self.openai_message,
                 max_tokens=openai_max_tokens,
                 temperature=openai_temperature)
+        except Exception as E:
+            print("Error ", E)
+            return text
         return response.choices[0].message.content
     

@@ -16,4 +16,3 @@ pilothub/__pycache__/__init__.cpython-310.pyc
 pilothub/__pycache__/pptnotes.cpython-310.pyc
 pilothub/__pycache__/pptx2content.cpython-310.pyc
 pilothub/__pycache__/withopenai.cpython-310.pyc
-tests/sample_test.ipynb
