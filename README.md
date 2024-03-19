@@ -18,21 +18,17 @@ jupyter:
   nbformat_minor: 2
 ---
 
-::: {.cell .markdown}
-# Pilothub
-:::
 
-::: {.cell .markdown}
+# Pilothub
+
+
+
 to install pilothub use
 
     pip install pilothub
-:::
 
-::: {.cell .markdown}
 ## PPT Notes Maker
-:::
 
-::: {.cell .code execution_count="16"}
 ``` python
 from pilothub.withopenai import ContentClient
 from pilothub.pptnotes import PPTx2Notes
@@ -42,30 +38,25 @@ api_key = "xxxxxxxxxxxxxxxxx"
 source_path = r"sample_data.pptx"
 dest_path = r"output_file.pptx"
 ```
-:::
 
-::: {.cell .code execution_count="17"}
 ``` python
 openai_client = ContentClient(openai_api_key=api_key,
                               open_ai_model=model,
                               max_tokens=2500,
                               temperature=0.7)
 ```
-:::
 
-::: {.cell .code execution_count="18"}
 ``` python
 ppt_client = PPTx2Notes(file_path=source_path)
 n = len(ppt_client.slides)
 print("Total Number of slides ",n)
 ```
 
-::: {.output .stream .stdout}
-    Total Number of slides  103
-:::
-:::
 
-::: {.cell .code execution_count="19"}
+    Total Number of slides  103
+
+
+
 ``` python
 skip_slides_index = [0,n-3,n-2,n-1,n]
 skip_slides_layout = ["1_Custom Layout","Quote Slide","Contemporary_Title v1","Section Header","Last_Slide v1","Quiz","Summary"]
@@ -74,9 +65,7 @@ ppt_client.set_skip_slides(skip_slides_index=skip_slides_index,
                            skip_slides_layout=skip_slides_layout,
                            skip_slide_titles=skip_slide_titles)
 ```
-:::
 
-::: {.cell .code execution_count="20"}
 ``` python
 ai_prompt_dict = {
     "CoverPage":"Explain the Module Name in 2 lines",
@@ -109,13 +98,9 @@ ppt_client.write_notes_to_pptx(output_path=dest_path,
                                DEFAULT_PROMPT_FOR_OTHER_SLIDES=default_prompt,
                                SKIP_NOTES_FOR_SLIDES_WITH_NOTES=True)
 ```
-:::
 
-::: {.cell .markdown}
 ## PPT to Handbook Maker
-:::
 
-::: {.cell .code execution_count="1"}
 ``` python
 from pilothub.ppt2hb import HandbookMaker
 
@@ -141,23 +126,3 @@ handbook_maker.convert_ppt_to_handbook(output_file_path=output_path,
                                        content_layout_name=content_layout_name,
                                        skip_text_from_slides=skip_text_from_slides)
 ```
-
-::: {.output .execute_result execution_count="1"}
-    'handbook.docx'
-:::
-:::
-
-::: {.cell .code}
-``` python
-```
-:::
-
-::: {.cell .code}
-``` python
-```
-:::
-
-::: {.cell .code}
-``` python
-```
-:::
