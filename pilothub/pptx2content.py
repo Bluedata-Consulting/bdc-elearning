@@ -74,7 +74,7 @@ class PPTxFile:
         self.skip_slides_layout = skip_slides_layout
         self.skip_slide_titles = skip_slide_titles
 
-    def converto_pdf(self, pdpd_auth_token, output_path):
+    def convert_to_pdf(self, pspd_auth_token, output_path):
         """Converts the pptx file to pdf using PSPD API
         You need to generate an auth token from PSPDFKit website
         and pass it as an argument to this function
@@ -87,7 +87,7 @@ class PPTxFile:
         instructions = json.dumps({'parts': [{'file': 'document'}]})
         url = 'https://api.pspdfkit.com/build'
         self.pdf_path = output_path
-        headers = {'Authorization': 'Bearer ' + pdpd_auth_token}
+        headers = {'Authorization': 'Bearer ' + pspd_auth_token}
         files = {'document': open(self.file_path, 'rb')}
         response = requests.request('POST', url, headers=headers,
                                     files=files,
