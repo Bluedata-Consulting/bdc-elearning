@@ -43,7 +43,7 @@ class ContentClient:
             )
         else:
             self.system_role = system_role
-        self.openai_message = [{"role": "system", "content": self.system_role},]
+        
 
     def get_notes_from_text(self, openai_model: str | None = None,
                             openai_max_tokens: int | None = None,
@@ -80,6 +80,7 @@ class ContentClient:
             Provide notes for the following information:
 
             """
+        self.openai_message = [{"role": "system", "content": self.system_role},]
         prompt += "\n```" + text + "```"
         self.openai_message.append({"role": "user", "content": prompt})
         if not prompt:
