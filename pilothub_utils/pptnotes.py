@@ -1,4 +1,5 @@
-from pilothub.pptx2content import PPTxFile
+from pilothub_utils.pptx2content import PPTxFile
+from tqdm import tqdm
 
 
 class PPTx2Notes(PPTxFile):
@@ -27,10 +28,13 @@ class PPTx2Notes(PPTxFile):
         :param SKIP_NOTES_FOR_SLIDES_WITH_NOTES: Whether to skip slides with existing notes.
         """
         self.content_client = content_client
-        for i, slide in enumerate(self.slides):
+        for i, slide in enumerate(tqdm(self.slides)):
             slide_text = self.get_slide_text(slide)
             layout = slide.slide_layout.name
 
+            # Add progress bar
+            progress = (i + 1) / len(self.slides) * 100
+            tqdm.write(f"Processing slide {i+1}/{len(self.slides)} - {progress:.2f}%")
             # check if slide has notes and need to skip the slide
             if SKIP_NOTES_FOR_SLIDES_WITH_NOTES:
                 # check if text size of existing notes is greater than 10 letters
@@ -66,5 +70,6 @@ class PPTx2Notes(PPTxFile):
                 prompt = DEFAULT_PROMPT_FOR_OTHER_SLIDES
                 notes_text = self.content_client.get_notes_from_text(
                     text=slide_text, prompt=prompt)
-                self.set_slide_notes(slide, notes_text)
+                self.set_slide_notes(slide, notes_text) 
         self.prs.save(output_path)
+        print(f"Notes written to {output_path}")
