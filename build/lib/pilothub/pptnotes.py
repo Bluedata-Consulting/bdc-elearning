@@ -1,4 +1,4 @@
-from pilothub.pptx2content import PPTxFile
+from pilothub_utils.pptx2content import PPTxFile
 
 
 class PPTx2Notes(PPTxFile):

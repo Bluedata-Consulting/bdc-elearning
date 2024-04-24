@@ -1,7 +1,10 @@
 from pptx import Presentation
 from docx import Document
 import re
-
+import os
+import comtypes.client
+from docx.shared import Inches,Cm
+import shutil
 
 class HandbookMaker:
     def __init__(self, ppt_file_path):
@@ -23,7 +26,6 @@ class HandbookMaker:
         self.doc = Document()
         self.ebook_title_set = False
         self.slide_titles = []
-
     def clean_text(self, text, skip_text_from_slides=[]):
         """
         Remove control characters and other non-XML compatible characters.
@@ -99,3 +101,85 @@ class HandbookMaker:
 
         self.doc.save(output_file_path)
         return output_file_path
+
+    def handbook_with_images(self, 
+                                skip_slides:list[str]=None,
+                                content_layout_name:str="Title and Content",
+                                output_file_path:str="output.docx",
+                                skip_text_from_slides:list[str]=[]):
+        """
+        Converts a PowerPoint presentation to a handbook document.
+
+        Args:
+            skip_slides (list): A list of slide layout names to skip during conversion.
+            content_layout_name (str): The name of the slide layout to use for slide content.
+            output_file_path (str): The file path to save the converted handbook document.
+
+        Returns:
+            str: The file path of the converted handbook document.
+        """
+        print("adding notes")
+        slide = self.ppt.slides[0]
+        powerpoint = comtypes.client.CreateObject("PowerPoint.Application")          
+        presentation = powerpoint.Presentations.Open(self.ppt_file_path)
+        
+        for shape in slide.shapes:
+            if shape.has_text_frame:
+                if "Module" in shape.text_frame.text:
+                    self.doc.add_heading(shape.text_frame.text, level=0)
+                    self.ebook_title_set = True
+                    break
+
+        for slide_idx, slide in enumerate(self.ppt.slides):
+            if slide.slide_layout.name in skip_slides:
+                continue
+            if slide.slide_layout.name == "Section Header":
+                self.doc.add_page_break()
+                section_title = slide.shapes[2].text_frame.text
+                self.doc.add_heading(section_title, level=1)
+            else:
+                if slide.slide_layout.name == content_layout_name and slide.shapes.title:
+                    slide_title = slide.shapes.title.text
+                    if slide_title not in self.slide_titles:
+                        self.slide_titles.append(slide_title)
+                        self.doc.add_page_break()
+                        self.doc.add_heading(self.clean_text(slide_title,skip_text_from_slides), level=2)
+                if slide.has_notes_slide:
+                    # Adding images
+                    image_folder_name = 'output'
+                    
+
+                    image_folder = os.path.join(os.getcwd(), image_folder_name)
+                    if not os.path.exists(image_folder):
+                        os.makedirs(image_folder)
+
+                    image_file_path = os.path.join(image_folder, f"slide_{slide_idx+1}.png")
+                    image_file_path = os.path.abspath(image_file_path)
+                    s = presentation.Slides[slide_idx+1]
+                    s.Export(image_file_path, "PNG")
+                    self.doc.add_picture(image_file_path,width= Cm(16.20),height =Cm(9.10))
+                    
+                    if os.path.exists(image_folder):
+                        shutil.rmtree(image_folder)
+                    else:
+                        print('Folder does not exists.')
+
+                     #adding text Notes
+                    notes_slide = slide.notes_slide
+                    notes_text = notes_slide.notes_text_frame.text
+                    cleaned_notes_text = self.clean_text(notes_text,skip_text_from_slides)
+                    
+                    self.add_content_to_doc(f"Notes: {cleaned_notes_text}")
+                    
+
+                # for shape in slide.shapes:
+                #     if shape.has_text_frame:
+                #         for paragraph in shape.text_frame.paragraphs:
+                #             cleaned_text = self.clean_text(paragraph.text,skip_text_from_slides)
+                #             self.add_content_to_doc(cleaned_text)
+
+        presentation.Close()
+        powerpoint.Quit()
+        self.doc.save(output_file_path)
+        return output_file_path
+    
