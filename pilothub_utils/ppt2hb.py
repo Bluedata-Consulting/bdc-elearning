@@ -40,6 +40,8 @@ class HandbookMaker:
         text = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]', '', text)
         text = re.sub(r'[\n]{2,}', '\n', text)
         text = re.sub(r'[\t]{2,}', '\t', text)
+        text = re.sub(r"(#|##|###|####|\*\*)", '', text)
+        # text = re.sub(r"(**)")
         for txt in skip_text_from_slides:
             text = re.sub(str(txt), "", text)
         return text
@@ -136,13 +138,14 @@ class HandbookMaker:
             if slide.slide_layout.name == "Section Header":
                 self.doc.add_page_break()
                 section_title = slide.shapes[2].text_frame.text
+                
                 self.doc.add_heading(section_title, level=1)
             else:
                 if slide.slide_layout.name == content_layout_name and slide.shapes.title:
                     slide_title = slide.shapes.title.text
                     if slide_title not in self.slide_titles:
                         self.slide_titles.append(slide_title)
-                        self.doc.add_page_break()
+                        # self.doc.add_page_break()
                         self.doc.add_heading(self.clean_text(slide_title,skip_text_from_slides), level=2)
                 if slide.has_notes_slide:
                     # Adding images
@@ -152,7 +155,8 @@ class HandbookMaker:
                     image_folder = os.path.join(os.getcwd(), image_folder_name)
                     if not os.path.exists(image_folder):
                         os.makedirs(image_folder)
-
+                    
+                    # self.doc.add_page_break()
                     image_file_path = os.path.join(image_folder, f"slide_{slide_idx+1}.png")
                     image_file_path = os.path.abspath(image_file_path)
                     s = presentation.Slides[slide_idx+1]
@@ -169,7 +173,8 @@ class HandbookMaker:
                     notes_text = notes_slide.notes_text_frame.text
                     cleaned_notes_text = self.clean_text(notes_text,skip_text_from_slides)
                     
-                    self.add_content_to_doc(f"Notes: {cleaned_notes_text}")
+                    self.add_content_to_doc(f"{cleaned_notes_text}")
+                    self.doc.add_page_break()
                     
 
                 # for shape in slide.shapes:
